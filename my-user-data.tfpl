@@ -1,0 +1,21 @@
+#cloud-config
+
+runcmd:
+  - mkdir /run/mydirs
+  - curl -fsSL https://tailscale.com/install.sh | sh
+  - ['sh', '-c', "echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf && echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf && sudo sysctl -p /etc/sysctl.d/99-tailscale.conf" ]
+  - tailscale up --ssh --accept-routes --authkey=${tailscale_auth_key}
+  #- tailscale set --ssh --advertise-exit-node
+  #- curl -fsSL https://get.docker.com | sh
+  
+apt:
+  sources_list:
+    deb $PRIMARY $RELEASE main restricted
+    deb $PRIMARY $RELEASE main-update restricted
+    deb $PRIMARY $RELEASE main-security restricted
+
+users:
+  - name: mgmt
+    groups: admin
+    ssh_authorized_keys:
+    - ssh-rsa blah
